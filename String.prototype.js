@@ -1,4 +1,6 @@
-String.prototype.removeMascara = function () {
+// Gabriel Malta
+
+String.prototype.removeMascara = function () {    
     if (this.valueOf())
         return this.valueOf().replace(/\.|\/|-|_/g, "");
 
