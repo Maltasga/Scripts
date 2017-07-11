@@ -23,7 +23,16 @@
     }
 
     function _isTypeof(type, obj) {
+        if (!type)
+            throw new Error("parâmetro (type) não informado");
         type = type.toLowerCase();
+
+        if (type === "null")
+            return obj === null;
+
+        if (type === "undefined")
+            return obj === undefined;
+
         obj = obj.constructor.toString().toLowerCase();
         return obj.indexOf(type) > -1;
     }
@@ -34,7 +43,7 @@
 
         return null;
     }
-    
+
     function _iterateElements(elements, callback) {
         var i, l = elements.length;
         for (i = 0; i < l; i++) { callback(element[i]); }
