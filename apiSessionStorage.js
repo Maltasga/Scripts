@@ -1,27 +1,31 @@
 window.kk_storage = (function () {
-    sessionStorage.setItem("tarefas", "[]");
+    "use strict";
 
-    function insertStorage(tarefas) {
-        if (!Array.isArray(tarefas))
+    var NOME_STORAGE_ITEM = "tarefas";
+    sessionStorage.setItem(NOME_STORAGE_ITEM, "[]");
+
+    function insertStorage(arrTarefas) {
+        if (!Array.isArray(arrTarefas))
             throw new Error("Deve ser um Array");
 
-        sessionStorage.setItem("tarefas", JSON.stringify(tarefas));
+        sessionStorage.setItem(NOME_STORAGE_ITEM, JSON.stringify(arrTarefas));
     }
 
     function getAll() {
-        return JSON.parse(sessionStorage.getItem("tarefas"));
+        return JSON.parse(sessionStorage.getItem(NOME_STORAGE_ITEM));
+    }
+
+    function getIndexById(id) {
+        return getAll().findIndex(x => x.id == id);
     }
 
     function getById(id) {
-        var item = null;
-        var db = getAll();
-        for (var i = 0; i < db.length; i++) {
-            var element = db[i];
-            if (element.id == id) {
-                item = db[i];
-                break;
-            }
-        }
+        var item = null,
+            arrResult = getAll().filter(element => element.id == id);
+
+        if (arrResult.length)
+            item = arrResult[0];
+
         return item;
     }
 
@@ -33,30 +37,36 @@ window.kk_storage = (function () {
 
     function editItem(item) {
         var db = getAll();
-        for (var i = 0; i < db.length; i++) {
-            var element = db[i];
-            if (element.id == item.id) {
-                db[i] = item;
-                break;
-            }
-        }
+        db[getIndexById(item.id)] = item;
         insertStorage(db);
     }
 
     function geraId() {
-        var novoId = Math.floor(Math.random() * 200);
         var booleanExiste = function () {
-            return getAll().filter(function (element) {
-                return element.id == novoId
-            }).length > 0;
-        }
+                return getAll().filter(elem => elem.id == intNovoId).length > 0;
+            },
+            intRandon = function () {
+                return Math.floor(Math.random() * 200);
+            },
+            intNovoId = intRandon()
+
         while (booleanExiste()) {
-            novoId = Math.floor(Math.random() * 200);
+            intNovoId = intRandon();
         }
-        return novoId;
+        return intNovoId;
     }
 
     return {
+        teste_mock: function () {
+            var o, i;
+            for (i = 1; i < 6; i++) {
+                o = {
+                    "id": geraId(),
+                    "nome": `Tarefa ${i}`
+                };
+                addItem(o);
+            }
+        },
         salvar: function (item) {
             item.id = geraId();
             addItem(item);
@@ -68,11 +78,9 @@ window.kk_storage = (function () {
         },
         getById: getById,
         getAll: getAll,
-        exluir: function (id) {
-            debugger;
+        excluir: function (id) {
             var db = getAll();
-            var index = db.findIndex(x => x.id == id);
-            db.splice(index, 1);
+            db.splice(getIndexById(id), 1);
             insertStorage(db);
         }
     };
